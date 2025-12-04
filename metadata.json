@@ -1,0 +1,5 @@
+{
+  "name": "MagicComic - AI Story Sketcher",
+  "description": "Generate magical 4-panel stories using Gemini AI and bring them to life with your own drawings.",
+  "requestFramePermissions": []
+}
