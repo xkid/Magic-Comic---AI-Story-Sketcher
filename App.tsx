@@ -25,6 +25,18 @@ const App: React.FC = () => {
   const [activePanelId, setActivePanelId] = useState<number | null>(null);
 
   const handleGenerateStory = async () => {
+    // Check for API Key if running in AI Studio environment
+    if (window.aistudio) {
+        try {
+            const hasKey = await window.aistudio.hasSelectedApiKey();
+            if (!hasKey) {
+                await window.aistudio.openSelectKey();
+            }
+        } catch (e) {
+            console.error("Error checking API key:", e);
+        }
+    }
+
     setLoading(true);
     setError(null);
     try {
@@ -206,7 +218,7 @@ const App: React.FC = () => {
                     <div className="relative border-4 border-indigo-900 bg-white shadow-xl rounded-lg overflow-hidden touch-none">
                         <div className="aspect-square w-full">
                             <DrawingCanvas
-                                ref={(el) => (canvasRefs.current[index] = el)}
+                                ref={(el) => { canvasRefs.current[index] = el; }}
                                 tool={currentTool}
                                 width={400}
                                 height={400}

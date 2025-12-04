@@ -1,16 +1,15 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { StoryPanel } from "../types";
 
-const apiKey = process.env.API_KEY;
-
-// Initialize the client
-const ai = new GoogleGenAI({ apiKey: apiKey });
-
 export const generateMagicalStory = async (): Promise<StoryPanel[]> => {
+  const apiKey = process.env.API_KEY;
+  
+  // Initialize inside the function to avoid top-level crash if key is missing on load
   if (!apiKey) {
-    throw new Error("API Key is missing.");
+    throw new Error("API Key is missing. Please ensure you have selected an API key.");
   }
 
+  const ai = new GoogleGenAI({ apiKey: apiKey });
   const model = "gemini-2.5-flash";
 
   const response = await ai.models.generateContent({
