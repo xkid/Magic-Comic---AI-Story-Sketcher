@@ -1,12 +1,45 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { StoryPanel } from "../types";
 
+// Helper to safely get API key from various environment configurations
+const getApiKey = (): string | undefined => {
+  // 1. Check for Vite environment (import.meta.env)
+  try {
+    // @ts-ignore
+    if (typeof import.meta !== 'undefined' && import.meta.env) {
+      // @ts-ignore
+      if (import.meta.env.VITE_API_KEY) return import.meta.env.VITE_API_KEY;
+      // @ts-ignore
+      if (import.meta.env.API_KEY) return import.meta.env.API_KEY;
+    }
+  } catch (e) {
+    // Ignore errors if import.meta is not supported
+  }
+
+  // 2. Check for Standard/CRA/Next.js environment (process.env)
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      // Check common prefixes used by deployment providers and frameworks
+      return process.env.API_KEY || 
+             process.env.REACT_APP_API_KEY || 
+             process.env.VITE_API_KEY || 
+             process.env.NEXT_PUBLIC_API_KEY;
+    }
+  } catch (e) {
+    // Ignore errors if process is not defined
+  }
+  
+  return undefined;
+};
+
 export const generateMagicalStory = async (): Promise<StoryPanel[]> => {
-  const apiKey = process.env.API_KEY;
+  const apiKey = getApiKey();
   
   // Initialize inside the function to avoid top-level crash if key is missing on load
   if (!apiKey) {
-    throw new Error("API Key is missing. Please ensure you have selected an API key.");
+    throw new Error(
+      "API Key not found. If deploying to Vercel/Netlify, please ensure your Environment Variable is named 'VITE_API_KEY' or 'REACT_APP_API_KEY'."
+    );
   }
 
   const ai = new GoogleGenAI({ apiKey: apiKey });
